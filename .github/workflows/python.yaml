@@ -6,6 +6,7 @@ on:
       - '*'
   pull_request:
     types: ['opened', 'reopened', 'synchronize']
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -118,7 +119,7 @@ jobs:
         MODULE: ${{ matrix.module }}
       run: |
         pip install numpy scipy cython coverage flaky
-        
+
         if [[ "$PYTHON" == "3.9" ]]; then
           conda install numba
         fi
@@ -166,6 +167,10 @@ jobs:
 
         pip install -e ".[dev,extra]"
       working-directory: ./python
+
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
 
     - name: Test with pytest
       env:
